@@ -3,12 +3,20 @@ package maze
 import (
 	"errors"
 	"fmt"
+	"log"
+	"regexp"
+	"strconv"
 )
 
 var (
 	colNames = []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 
 	InvalidColumnNameErr = errors.New("invalid column name")
+	InvalidRowErr        = errors.New("invalid row number")
+	InvalidCellErr       = errors.New("invalid cell")
+
+	// regex to extract ColumnName from string
+	r, _ = regexp.Compile("[A-Z]*")
 )
 
 const (
@@ -17,8 +25,8 @@ const (
 
 // Cell represents a cell in a maze
 type Cell struct {
-	Row int
-	Col int
+	Row int `json:"row"`
+	Col int `json:"col"`
 }
 
 // Up checks if we can move once cell up in the maze. A move is valid if the
@@ -89,6 +97,12 @@ func (c Cell) Right(maze Matrix) (Cell, bool) {
 	return Cell{}, false
 }
 
+// IsSame compares the cell with the provided one. If the Row and Col are the same
+// then the cells are the same
+func (c Cell) IsSame(cell Cell) bool {
+	return c.Row == cell.Row && c.Col == cell.Col
+}
+
 // String returns a string representation fo the cell
 func (c Cell) String() string {
 	return fmt.Sprintf("%s%d", ConvertIntToColumn(c.Col), c.Row)
@@ -124,12 +138,18 @@ func ConvertIntToColumn(col int) string {
 }
 
 // ConvertColumnToInt converts colName to integer value.
+// If the colName is empty then InvalidColumnErr is returned.
+//
 // If the conversion succeeds the integer value is returned, otherwise
 // InvalidColumnErr is returned.
 //
 // Column names are in the format of:
 // A-Z, AA-AZ, BA-BZ, CA-CZ, ... , AAA..AAZ, ABA..ABZ, ... , AAAA...
 func ConvertColumnToInt(colName string) (int, error) {
+	if len(colName) == 0 {
+		return 0, InvalidColumnNameErr
+	}
+
 	if len(colName) == 1 {
 		idx := IndexOf(colNames, colName)
 		if idx == -1 {
@@ -163,4 +183,45 @@ func IndexOf(slice []string, item string) int {
 		}
 	}
 	return -1
+}
+
+// ParseCell parses the provided string to a valid Cell.
+//
+// If the provided string does not have a column or the columnName is invalid, then
+//  InvalidColumnNameErr is returned.
+//
+// If the provided string does not have a row or the row is not valid number, then
+// InvalidRowErr is returned.
+// If the string provided does not have neither columnName nor row number then
+// InvalidCellErr is returned.
+func ParseCell(cell string) (Cell, error) {
+	v := r.FindStringIndex(cell)
+	if v != nil {
+		colName := cell[:v[1]]
+		row := cell[v[1]:]
+
+		colNo, err := ConvertColumnToInt(colName)
+		if err != nil {
+			log.Println("Error converting column Name to integer. Error: ", err)
+			return Cell{}, InvalidColumnNameErr
+		}
+
+		rowNo, err := strconv.Atoi(row)
+		if err != nil {
+			log.Println("Row is not valid number. Error: ", err)
+			return Cell{}, InvalidRowErr
+		}
+
+		if rowNo < 1 {
+			log.Println("Row number has to be 1 or more")
+			return Cell{}, InvalidRowErr
+		}
+
+		return Cell{
+			Row: rowNo - 1,
+			Col: colNo,
+		}, nil
+	}
+
+	return Cell{}, InvalidCellErr
 }

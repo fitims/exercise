@@ -252,3 +252,31 @@ func TestCell_Right(t *testing.T) {
 		t.Error(fmt.Sprintf("Invalid cell returned. Expected: (r:2, c:2), GOT: (r:%d, c:%d)", up.Row, up.Col))
 	}
 }
+
+func TestParseCell(t *testing.T) {
+	testData := []struct {
+		cellStr       string
+		expectedCell  Cell
+		expectedError error
+	}{
+		{cellStr: "A1", expectedCell: Cell{Row: 0, Col: 0}, expectedError: nil},
+		{cellStr: "B1", expectedCell: Cell{Row: 0, Col: 1}, expectedError: nil},
+		{cellStr: "C3", expectedCell: Cell{Row: 2, Col: 2}, expectedError: nil},
+		{cellStr: "AA35", expectedCell: Cell{Row: 34, Col: 26}, expectedError: nil},
+		{cellStr: "AAA200", expectedCell: Cell{Row: 199, Col: 26 * 26}, expectedError: nil},
+		{cellStr: "##200", expectedCell: Cell{}, expectedError: InvalidColumnNameErr},
+		{cellStr: "AA", expectedCell: Cell{}, expectedError: InvalidRowErr},
+	}
+
+	for _, v := range testData {
+		cell, err := ParseCell(v.cellStr)
+
+		if err != v.expectedError {
+			t.Error(fmt.Sprintf("Error. Expected: %v, GOT: %v", v.expectedError, err))
+		}
+
+		if !cell.IsSame(v.expectedCell) {
+			t.Error(fmt.Sprintf("Cells should be same. Expected: (c:%d, r:%d), GOT: (c:%d, r:%d)", v.expectedCell.Row, v.expectedCell.Col, cell.Col, cell.Row))
+		}
+	}
+}
