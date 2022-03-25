@@ -187,11 +187,14 @@ func IndexOf(slice []string, item string) int {
 
 // ParseCell parses the provided string to a valid Cell.
 //
+// A valid cell is: A1, B5, AA12, CD56, etc.
+//
 // If the provided string does not have a column or the columnName is invalid, then
-//  InvalidColumnNameErr is returned.
+// InvalidColumnNameErr is returned.
 //
 // If the provided string does not have a row or the row is not valid number, then
 // InvalidRowErr is returned.
+//
 // If the string provided does not have neither columnName nor row number then
 // InvalidCellErr is returned.
 func ParseCell(cell string) (Cell, error) {
