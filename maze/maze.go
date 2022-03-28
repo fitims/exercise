@@ -12,7 +12,7 @@ var (
 
 // Maze encapsulates all the details about the maze
 type Maze struct {
-	Id        uint   `json:"id"`
+	Id        uint64 `json:"id"`
 	Entrance  Cell   `json:"entrance"`
 	Matrix    Matrix `json:"matrix"`
 	GridSize  Size   `json:"gridSize"`
@@ -23,7 +23,7 @@ type Maze struct {
 
 // NewMaze initialises a new Maze by creating the actual maze as a matrix of the size provided,
 // and storing the entrance of the maze and the walls
-func NewMaze(id uint, entrance, gridSize string, wall []string) (*Maze, error) {
+func NewMaze(id uint64, entrance, gridSize string, wall []string) (*Maze, error) {
 	e, err := ParseCell(entrance)
 	if err != nil {
 		log.Println("Could not parse entrance. Error: ", err)

@@ -7,7 +7,7 @@ import (
 
 type UserRepository interface {
 	GetUser(username string) (*User, error)
-	RegisterUser(username, password string) error
+	SaveUser(username, password string) error
 	GetUserValidator() authentication.ClaimsValidator
 }
 

@@ -15,6 +15,12 @@ type defaultMazeController struct {
 	repository repo.MazeRepository
 }
 
+func NewMazeController(r repo.MazeRepository) MazeController {
+	return &defaultMazeController{
+		repository: r,
+	}
+}
+
 func (ctrl defaultMazeController) CreateMaze(c echo.Context) error {
 
 	return nil
