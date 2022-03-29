@@ -80,10 +80,10 @@ func (ctrl defaultMazeController) GetMazes(c echo.Context) error {
 	mazes, err := ctrl.repository.GetMazesForUser(authUsr.GetUsername())
 	if err != nil {
 		log.Errorln("Could not get mazes for the user. Error: ", err)
-		return c.JSON(http.StatusInternalServerError, responses.MazeRetreivalFailed("Could not get user details. please try later on."))
+		return c.JSON(http.StatusInternalServerError, responses.MazeRetrievalFailed("Could not get mazes for user. please try later on."))
 	}
 
-	return nil
+	return c.JSON(http.StatusOK, responses.MazeRetrievalSuccessful(mazes))
 }
 
 func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
