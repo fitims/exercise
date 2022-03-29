@@ -6,11 +6,12 @@ import (
 )
 
 const (
-	MazeId   = ":mazeId"
-	Register = "/user"
-	Login    = "/login"
-	Maze     = "/maze"
-	Solution = "/maze/" + MazeId + "/solution"
+	MazeId             = ":mazeId"
+	Register           = "/user"
+	Login              = "/login"
+	Maze               = "/maze"
+	Solution           = "/maze/" + MazeId + "/solution"
+	SolutionQueryParam = "steps"
 )
 
 func SetUserRoutes(grp GroupWrapper, c controllers2.UserController) {

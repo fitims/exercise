@@ -1,20 +1,36 @@
 package maze
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fitims/exercise/log"
 )
 
+type MazeState int
+type PathPredicate func(Path, Path) bool
+
+const (
+	NotSolved        MazeState = 0
+	NoSolutions      MazeState = 1
+	TooManySolutions MazeState = 2
+	Solved           MazeState = 3
+)
+
 // Maze encapsulates all the details about the maze
 type Maze struct {
-	Id        uint64 `json:"id"`
-	Entrance  Cell   `json:"entrance"`
-	Matrix    Matrix `json:"matrix"`
-	GridSize  Size   `json:"gridSize"`
-	Walls     []Cell `json:"walls"`
-	IsSolved  bool   `json:"isSolved"`
-	Solutions []Path `json:"solutions,omitempty"`
+	Id        uint64    `json:"id"`
+	Entrance  Cell      `json:"entrance"`
+	Matrix    Matrix    `json:"matrix"`
+	GridSize  Size      `json:"gridSize"`
+	Walls     []Cell    `json:"walls"`
+	State     MazeState `json:"state"`
+	Solutions []Path    `json:"solutions,omitempty"`
 }
+
+var (
+	NoSolutionErr    = errors.New("maze does not have a solution")
+	ManySolutionsErr = errors.New("maze has more than one solution")
+)
 
 // NewMaze initialises a new Maze by creating the actual maze as a matrix of the size provided,
 // and storing the entrance of the maze and the walls
@@ -48,24 +64,89 @@ func NewMaze(id uint64, entrance, gridSize string, wall []string) (*Maze, error)
 		Entrance:  e,
 		GridSize:  s,
 		Matrix:    NewMatrix(s, w),
-		IsSolved:  false,
+		State:     NotSolved,
 		Walls:     w,
 		Solutions: make([]Path, 0),
 	}
 	return maze, nil
 }
 
-// Solve will try to solve the maze by walking through the maze and finding all possible solutions.
-func (m *Maze) Solve() ([]Path, bool) {
-	path := make(Path, 0)
-	path = append(path, m.Entrance)
+// Solve will try to solve the maze by walking through the maze and finding all possible solutions if
+// the maze is not already solved. If it is solved then checks for the solutions.
+// If the maze has no solutions it returns NoSolutions error, if more than one different solution
+// then it returns TooManySolutions error. If it only one solution or more than one but with the same
+// exit then the maze is valid and no error is returned
+func (m *Maze) Solve() error {
 
-	// walk through the maze and find all the possible solutions
-	m.walkTheMaze(m.Entrance, path)
+	if m.State == NotSolved {
+		path := make(Path, 0)
+		path = append(path, m.Entrance)
 
-	// mark the maze as solved
-	m.IsSolved = true
-	return m.Solutions, len(m.Solutions) > 0
+		// walk through the maze and find all the possible solutions
+		m.walkTheMaze(m.Entrance, path)
+	}
+
+	if len(m.Solutions) == 0 {
+		m.State = NoSolutions
+		return NoSolutionErr
+	}
+
+	if len(m.Solutions) > 1 {
+		sol := m.Solutions[0].GetExitCell()
+
+		for i := 1; i < len(m.Solutions); i++ {
+			if !sol.IsSame(m.Solutions[i].GetExitCell()) {
+				m.State = TooManySolutions
+				return ManySolutionsErr
+			}
+		}
+	}
+	m.State = Solved
+	return nil
+}
+
+// GetShortestPath return the shortest solution path for the maze. If the maze
+// does not have any solutions then NoSolutionErr error is returned. If
+// the maze has more than one different solutions then  TooManySolutions error is returned
+func (m *Maze) GetShortestPath() (Path, error) {
+	return m.GetPath(func(p1, p2 Path) bool {
+		return len(p1) > len(p2)
+	})
+}
+
+// GetLongestPath return the longest solution path for the maze. If the maze
+// does not have any solutions then NoSolutionErr error is returned. If
+// the maze has more than one different solutions then  TooManySolutions error is returned
+func (m *Maze) GetLongestPath() (Path, error) {
+	return m.GetPath(func(p1, p2 Path) bool {
+		return len(p1) < len(p2)
+	})
+}
+
+// GetPath return the solution path for the maze. If the maze
+// does not have any solutions then NoSolutionErr error is returned. If
+// the maze has more than one different solutions then  TooManySolutions error is returned
+// If the maze is not solved, it first is solved.
+func (m *Maze) GetPath(predicate PathPredicate) (Path, error) {
+	if m.State == NotSolved {
+		_ = m.Solve()
+	}
+
+	if m.State == TooManySolutions {
+		return nil, ManySolutionsErr
+	}
+
+	if m.State == NoSolutions {
+		return nil, NoSolutionErr
+	}
+
+	path := m.Solutions[0]
+	for i := 1; i < len(m.Solutions); i++ {
+		if predicate(path, m.Solutions[i]) {
+			path = m.Solutions[i]
+		}
+	}
+	return path, nil
 }
 
 // walkTheMaze is a recursive functions that walks through the maze finding all the possible solutions.

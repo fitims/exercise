@@ -5,11 +5,14 @@ import (
 	"github.com/fitims/exercise/cmd/restapi/controllers/requests"
 	"github.com/fitims/exercise/cmd/restapi/controllers/responses"
 	"github.com/fitims/exercise/cmd/restapi/middleware/authentication"
+	"github.com/fitims/exercise/cmd/restapi/routes"
 	"github.com/fitims/exercise/log"
 	"github.com/fitims/exercise/maze"
 	"github.com/fitims/exercise/repo"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 // MazeController is the interface that defines the behaviour of the
@@ -75,6 +78,7 @@ func (ctrl defaultMazeController) CreateMaze(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.MazeCreationSuccessful())
 }
 
+// GetMazes handles maze retrieval for the logged user (user provided in the token as claims)
 func (ctrl defaultMazeController) GetMazes(c echo.Context) error {
 	authUsr := c.Get(authentication.AuthUser).(authentication.Identity)
 	mazes, err := ctrl.repository.GetMazesForUser(authUsr.GetUsername())
@@ -86,6 +90,45 @@ func (ctrl defaultMazeController) GetMazes(c echo.Context) error {
 	return c.JSON(http.StatusOK, responses.MazeRetrievalSuccessful(mazes))
 }
 
+// GetSolution retrieves the solution for the specified maze
 func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
-	return nil
+	steps := c.QueryParam(routes.SolutionQueryParam)
+	if len(steps) > 0 && (strings.ToLower(steps) != "min" || strings.ToLower(steps) != "max") {
+		return c.JSON(http.StatusBadRequest, responses.MazeSolutionFailed("Invalid request. Steps can be 'min' or 'max"))
+	}
+
+	mazeIdParam := c.Param(routes.MazeId)
+	id, err := strconv.ParseUint(mazeIdParam, 10, 64)
+	if err != nil {
+		log.Errorln("Cannot parse uint64. Error: ", err)
+		return c.JSON(http.StatusBadRequest, responses.MazeSolutionFailed("Invalid request. Maze Id has to be valid number"))
+	}
+
+	// get the user from the middleware
+	authUsr := c.Get(authentication.AuthUser).(authentication.Identity)
+
+	maze, err := ctrl.repository.GetMaze(authUsr.GetUsername(), id)
+	if err != nil {
+		if errors.Is(err, repo.MazeDoesNotExistErr) {
+			return c.JSON(http.StatusBadRequest, responses.MazeSolutionFailed("Maze does not exist"))
+		}
+		log.Errorln("Could not get maze. Error: ", err)
+		return c.JSON(http.StatusInternalServerError, responses.MazeSolutionFailed("Could not get maze details. please try later on."))
+	}
+
+	// get longest path
+	if strings.ToLower(steps) == "max" {
+		path, err := maze.GetLongestPath()
+		if err != nil {
+			return c.JSON(http.StatusOK, responses.MazeSolutionFailed(err.Error()))
+		}
+		return c.JSON(http.StatusOK, responses.MazeSolutionSuccessful(path))
+	}
+
+	// get shortest path
+	path, err := maze.GetShortestPath()
+	if err != nil {
+		return c.JSON(http.StatusOK, responses.MazeSolutionFailed(err.Error()))
+	}
+	return c.JSON(http.StatusOK, responses.MazeSolutionSuccessful(path))
 }
