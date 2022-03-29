@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"errors"
+	"github.com/fitims/exercise/cmd/restapi/controllers/requests"
+	"github.com/fitims/exercise/cmd/restapi/controllers/responses"
 	"github.com/fitims/exercise/cmd/restapi/middleware/authentication/tokens"
-	"github.com/fitims/exercise/cmd/restapi/routes/controllers/requests"
-	"github.com/fitims/exercise/cmd/restapi/routes/controllers/responses"
+	"github.com/fitims/exercise/log"
 	"github.com/fitims/exercise/repo"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -12,11 +13,16 @@ import (
 	"unicode"
 )
 
+// UserController is the interface that defines the behaviour of the
+// user controller. UserController handles all the requests regarding the user
+// ie. login and user registration
 type UserController interface {
 	Register(c echo.Context) error
 	Login(c echo.Context) error
 }
 
+// defaultUserController is the default implementation of the UserController
+// interface
 type defaultUserController struct {
 	repository repo.UserRepository
 }
@@ -33,6 +39,7 @@ func (ctrl defaultUserController) Register(c echo.Context) error {
 	var req requests.RegisterRequest
 	err := c.Bind(&req)
 	if err != nil {
+		log.Errorln("Error binding RegisterRequest. Error: ", err)
 		return c.JSON(http.StatusBadRequest, responses.RegistrationFailed("The request is not valid"))
 	}
 
@@ -41,11 +48,12 @@ func (ctrl defaultUserController) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.RegistrationFailed("password is too weak"))
 	}
 
-	err = ctrl.repository.RegisterUser(req.Username, string(hash))
+	err = ctrl.repository.SaveUser(req.Username, string(hash))
 	if err != nil {
 		if errors.Is(err, repo.UserExistsErr) {
 			return c.JSON(http.StatusBadRequest, responses.RegistrationFailed("User is already registered"))
 		}
+		log.Errorln("Could not get the details for the user. Error: ", err)
 		return c.JSON(http.StatusInternalServerError, responses.RegistrationFailed("Could not get user details. please try later on."))
 	}
 
@@ -57,6 +65,7 @@ func (ctrl defaultUserController) Login(c echo.Context) error {
 	var req requests.LoginRequest
 	err := c.Bind(&req)
 	if err != nil {
+		log.Errorln("Error binding LoginRequest. Error: ", err)
 		return c.JSON(http.StatusBadRequest, responses.LoginFailed("The request is not valid"))
 	}
 
@@ -66,6 +75,7 @@ func (ctrl defaultUserController) Login(c echo.Context) error {
 		if errors.Is(err, repo.UserDoesNotExistErr) {
 			return c.JSON(http.StatusBadRequest, responses.LoginFailed("User does not exist"))
 		}
+		log.Errorln("Could not get the details for the user. Error: ", err)
 		return c.JSON(http.StatusInternalServerError, responses.LoginFailed("Could not get user details. please try later on."))
 	}
 
@@ -78,6 +88,7 @@ func (ctrl defaultUserController) Login(c echo.Context) error {
 	// generate login tokens
 	authTokens, err := tokens.GenerateAuthTokens(usr.ToClaims())
 	if err != nil {
+		log.Errorln("Could not get the generate tokens. Error: ", err)
 		return c.JSON(http.StatusInternalServerError, responses.LoginFailed("could not generate login tokens"))
 	}
 	return c.JSON(http.StatusOK, responses.LoginSuccessful(&authTokens))

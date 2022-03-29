@@ -1,13 +1,8 @@
 package maze
 
 import (
-	"errors"
 	"fmt"
-	"log"
-)
-
-var (
-	InvalidGridSizeErr = errors.New("invalid grid size")
+	"github.com/fitims/exercise/log"
 )
 
 // Maze encapsulates all the details about the maze
@@ -26,25 +21,25 @@ type Maze struct {
 func NewMaze(id uint64, entrance, gridSize string, wall []string) (*Maze, error) {
 	e, err := ParseCell(entrance)
 	if err != nil {
-		log.Println("Could not parse entrance. Error: ", err)
+		log.Errorln("Could not parse entrance. Error: ", err)
 		return nil, err
 	}
 
 	s, err := ParseGridSize(gridSize)
 	if err != nil {
-		log.Println("Could not parse grid Size. Error: ", err)
+		log.Errorln("Could not parse grid Size. Error: ", err)
 		return nil, err
 	}
 
 	// if the grid size is not valid return an error
 	if !s.IsValid() {
-		log.Println("The grid size is too small")
+		log.Errorln("The grid size is too small")
 		return nil, InvalidGridSizeErr
 	}
 
 	w, err := ParseWall(wall)
 	if err != nil {
-		log.Println("Could not parse the wall. Error: ", err)
+		log.Errorln("Could not parse the wall. Error: ", err)
 		return nil, err
 	}
 
@@ -128,7 +123,7 @@ func ParseWall(wall []string) ([]Cell, error) {
 	for _, v := range wall {
 		cell, err := ParseCell(v)
 		if err != nil {
-			log.Println(fmt.Sprintf("Error parsing the wall cell [%s]. Error: %s", v, err.Error()))
+			log.Errorln(fmt.Sprintf("Error parsing the wall cell [%s]. Error: %s", v, err.Error()))
 			return nil, err
 		}
 		wallCells = append(wallCells, cell)

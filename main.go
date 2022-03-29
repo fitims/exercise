@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	controllers2 "github.com/fitims/exercise/cmd/restapi/controllers"
 	"github.com/fitims/exercise/cmd/restapi/middleware/authentication"
 	"github.com/fitims/exercise/cmd/restapi/routes"
-	"github.com/fitims/exercise/cmd/restapi/routes/controllers"
 	"github.com/fitims/exercise/log"
 	"github.com/fitims/exercise/repo/embedded"
 	"github.com/labstack/echo/v4"
@@ -27,8 +27,8 @@ func main() {
 		return
 	}
 
-	userController := controllers.NewUserController(repo)
-	mazeController := controllers.NewMazeController(repo)
+	userController := controllers2.NewUserController(repo)
+	mazeController := controllers2.NewMazeController(repo)
 	authenticator := authentication.NewUserAuthenticator(repo.GetUserValidator())
 
 	routes.SetUserRoutes(e, userController)

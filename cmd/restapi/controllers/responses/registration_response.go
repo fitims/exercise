@@ -1,10 +1,13 @@
 package responses
 
+// RegistrationResponse is the response sent back when user tries to register.
+// The registration can be successful or it can fail.
 type RegistrationResponse struct {
 	IsSuccess bool   `json:"is_success"`
 	Message   string `json:"message"`
 }
 
+// RegistrationFailed build a failed response
 func RegistrationFailed(msg string) RegistrationResponse {
 	return RegistrationResponse{
 		IsSuccess: false,
@@ -12,6 +15,7 @@ func RegistrationFailed(msg string) RegistrationResponse {
 	}
 }
 
+// RegistrationSuccessful builds a successful response
 func RegistrationSuccessful() RegistrationResponse {
 	return RegistrationResponse{
 		IsSuccess: true,

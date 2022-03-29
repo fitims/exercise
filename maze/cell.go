@@ -20,7 +20,7 @@ var (
 
 	InvalidColumnNameErr = errors.New("invalid column name. Columns can be A-Z")
 	InvalidRowErr        = errors.New("invalid row number. Rows can be 1-26")
-	InvalidCellErr       = errors.New("invalid cell")
+	InvalidCellErr       = errors.New("invalid cell. Valid cells can be from A1-Z26")
 )
 
 // Cell represents a cell in a maze

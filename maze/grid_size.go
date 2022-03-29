@@ -1,6 +1,8 @@
 package maze
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -11,6 +13,10 @@ type Size struct {
 	Rows    int `json:"rows"`
 	Columns int `json:"columns"`
 }
+
+var (
+	InvalidGridSizeErr = errors.New("invalid grid size. The minimum valid grid size is 1x1 and maximum valid grid size is 26x26")
+)
 
 // ParseGridSize parses the provided string into rows and columns. The valid format for
 // gridSize string si in the format of [cols]x[rows] ie. 5x5, 8x8, 12x10, etc.
@@ -54,4 +60,9 @@ func ParseGridSize(gridSize string) (Size, error) {
 func (s Size) IsValid() bool {
 	return s.Rows >= MinRows && s.Rows <= MaxRows &&
 		s.Columns >= MinCols && s.Columns <= MaxCols
+}
+
+// String returns size to string representation
+func (s Size) String() string {
+	return fmt.Sprintf("%dx%d", s.Rows, s.Columns)
 }
