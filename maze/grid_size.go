@@ -62,6 +62,12 @@ func (s Size) IsValid() bool {
 		s.Columns >= MinCols && s.Columns <= MaxCols
 }
 
+// IsSame compares the grid size with the provided one. If the Rows and Cols are the same
+// then the grid sizes are the same
+func (s Size) IsSame(size Size) bool {
+	return s.Rows == size.Rows && s.Columns == size.Columns
+}
+
 // String returns size to string representation
 func (s Size) String() string {
 	return fmt.Sprintf("%dx%d", s.Rows, s.Columns)
