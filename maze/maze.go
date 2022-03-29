@@ -75,7 +75,43 @@ func NewMaze(id uint64, entrance, gridSize string, wall []string) (*Maze, error)
 // the maze is not already solved. If it is solved then checks for the solutions.
 // If the maze has no solutions it returns NoSolutions error, if more than one different solution
 // then it returns TooManySolutions error. If it only one solution or more than one but with the same
-// exit then the maze is valid and no error is returned
+// exit then the maze is valid and no error is returned.
+//
+// The assumption is that the solution can only be at the bottom of the maze.
+//
+// So we start from the top to bottom.
+// ie. imagine that we have a maze defined with the following information:
+//
+// entrance  : A1
+// grid size : 8x8
+// walls     : [C1,G1,A2,C2,E2,G2,C3,E3,B4,C4,E4,F4,G4,B5,E5,B6,D6,E6,G6,H6,B7,D7,G7,B8]
+//
+// the maze would look like:
+//
+//    A B C D E F G H
+//  1 |*| |█| | | |█| |
+//  2 |█| |█| |█|█| | |
+//  3 | | |█| |█| | | |
+//  4 | |█|█| |█|█|█| |
+//  5 | |█| | |█| | | |
+//  6 | |█| |█|█| |█|█|
+//  7 | |█| |█| | |█| |
+//  8 | |█| | | | | | |
+//
+//  so the solution will be:
+//
+//    A B C D E F G H
+//  1 |░|░|█| | | |█| |
+//  2 |█|░|█| |█|█| | |
+//  3 |░|░|█| |█| | | |
+//  4 |░|█|█| |█|█|█| |
+//  5 |░|█| | |█| | | |
+//  6 |░|█| |█|█| |█|█|
+//  7 |░|█| |█| | |█| |
+//  8 |░|█| | | | | | |
+//
+// which translates to : [A1, B1, B2, B3, A3, A4, A5, A6, A7, A8]
+//
 func (m *Maze) Solve() error {
 
 	if m.State == NotSolved {
@@ -153,46 +189,34 @@ func (m *Maze) GetPath(predicate PathPredicate) (Path, error) {
 // For each possible cell movement (Up, Down, Left, Right) it calls itself passing the adjacent cell and
 // the path travelled so far
 func (m *Maze) walkTheMaze(currentCell Cell, currentPath Path) {
-	p := currentPath
 	m.Matrix.Visit(currentCell)
+
+	if m.Matrix.IsSolution(currentCell) {
+		m.Solutions = append(m.Solutions, currentPath)
+		return
+	}
 
 	// move up
 	if c, ok := currentCell.Up(m.Matrix); ok {
-		p = append(p, c)
-		if m.Matrix.IsSolution(c) {
-			m.Solutions = append(m.Solutions, p)
-			return
-		}
+		p := append(currentPath, c)
 		m.walkTheMaze(c, p)
 	}
 
 	// move down
 	if c, ok := currentCell.Down(m.Matrix); ok {
-		p = append(p, c)
-		if m.Matrix.IsSolution(c) {
-			m.Solutions = append(m.Solutions, p)
-			return
-		}
+		p := append(currentPath, c)
 		m.walkTheMaze(c, p)
 	}
 
 	// move left
 	if c, ok := currentCell.Left(m.Matrix); ok {
-		p = append(p, c)
-		if m.Matrix.IsSolution(c) {
-			m.Solutions = append(m.Solutions, p)
-			return
-		}
+		p := append(currentPath, c)
 		m.walkTheMaze(c, p)
 	}
 
 	// move right
 	if c, ok := currentCell.Right(m.Matrix); ok {
-		p = append(p, c)
-		if m.Matrix.IsSolution(c) {
-			m.Solutions = append(m.Solutions, p)
-			return
-		}
+		p := append(currentPath, c)
 		m.walkTheMaze(c, p)
 	}
 }

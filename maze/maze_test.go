@@ -74,3 +74,81 @@ func TestParseWall(t *testing.T) {
 		}
 	}
 }
+
+func TestMaze_Solve_NoSolution(t *testing.T) {
+	m := Maze{
+		Id:       0,
+		Entrance: Cell{0, 0},
+		Matrix: Matrix{
+			{Free, Wall, Free, Free},
+			{Free, Wall, Free, Free},
+			{Free, Wall, Free, Free},
+			{Wall, Wall, Exit, Exit},
+		},
+		State: NotSolved,
+	}
+
+	err := m.Solve()
+	if err != NoSolutionErr {
+		t.Error(fmt.Sprintf("Expected: %v, Got: %v", NoSolutionErr, err))
+	}
+
+	if m.State != NoSolutions {
+		t.Error(fmt.Sprintf("Expected: NoSolutions (1), Got: %d", m.State))
+	}
+}
+
+func TestMaze_Solve_DifferentSolutions(t *testing.T) {
+	m := Maze{
+		Id:       0,
+		Entrance: Cell{0, 0},
+		Matrix: Matrix{
+			{Free, Wall, Free, Free},
+			{Free, Wall, Wall, Free},
+			{Free, Free, Free, Wall},
+			{Exit, Wall, Exit, Wall},
+		},
+		State: NotSolved,
+	}
+
+	err := m.Solve()
+	if err != ManySolutionsErr {
+		t.Error(fmt.Sprintf("Expected: %v, Got: %v", ManySolutionsErr, err))
+	}
+
+	if m.State != TooManySolutions {
+		t.Error(fmt.Sprintf("Expected: TooManySolutions (1), Got: %d", m.State))
+	}
+}
+
+func TestMaze_Solve_ManySolutions(t *testing.T) {
+	m := Maze{
+		Id:       0,
+		Entrance: Cell{0, 0},
+		Matrix: Matrix{
+			{Free, Wall, Wall, Free},
+			{Free, Free, Free, Free},
+			{Free, Wall, Wall, Wall},
+			{Free, Free, Free, Free},
+			{Exit, Wall, Wall, Wall},
+		},
+		State: NotSolved,
+	}
+
+	err := m.Solve()
+	if err != nil {
+		t.Error(fmt.Sprintf("Expected: nil, Got: %v", err))
+	}
+
+	if m.State != Solved {
+		t.Error(fmt.Sprintf("Expected: Solved (3), Got: %d", m.State))
+	}
+}
+
+func TestMaze_GetLongestPath(t *testing.T) {
+
+}
+
+func TestMaze_GetShortestPath(t *testing.T) {
+
+}

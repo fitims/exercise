@@ -79,20 +79,20 @@ func TestMatrix_IsSolution(t *testing.T) {
 		cell       Cell
 		isSolution bool
 	}{
-		{Cell{Row: 0, Col: 0}, true},
+		{Cell{Row: 0, Col: 0}, false},
 		{Cell{Row: 0, Col: 1}, false},
-		{Cell{Row: 0, Col: 2}, true},
-		{Cell{Row: 0, Col: 3}, true},
-		{Cell{Row: 1, Col: 0}, true},
+		{Cell{Row: 0, Col: 2}, false},
+		{Cell{Row: 0, Col: 3}, false},
+		{Cell{Row: 1, Col: 0}, false},
 		{Cell{Row: 1, Col: 1}, false},
 		{Cell{Row: 1, Col: 2}, false},
-		{Cell{Row: 1, Col: 3}, true},
-		{Cell{Row: 2, Col: 0}, true},
+		{Cell{Row: 1, Col: 3}, false},
+		{Cell{Row: 2, Col: 0}, false},
 		{Cell{Row: 2, Col: 1}, false},
 		{Cell{Row: 2, Col: 2}, false},
-		{Cell{Row: 2, Col: 3}, true},
+		{Cell{Row: 2, Col: 3}, false},
 		{Cell{Row: 3, Col: 0}, true},
-		{Cell{Row: 3, Col: 1}, false},
+		{Cell{Row: 3, Col: 1}, false}, // wall
 		{Cell{Row: 3, Col: 2}, true},
 		{Cell{Row: 3, Col: 3}, true},
 	}
