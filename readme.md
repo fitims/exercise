@@ -6,8 +6,9 @@ carefully, not following them will reflect negatively on your application.
 You should implement the necessary logic for the following flow:
 
 1. User registers via ```POST /user``` endpoint with the following fields:
-   a. username (i.e. happyUser)
-   b. password (i.e. iTk19!n)
+   * username (i.e. happyUser)
+   * password (i.e. iTk19!n)
+   
 2. User logs in via ```POST /login``` endpoint
 3. The API creates a session and responds with a token
 
