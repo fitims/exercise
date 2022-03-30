@@ -18,7 +18,7 @@ You should implement the necessary logic for the following flow:
    a. gridSize (size of a maze grid i.e. 10x10)
    b. walls (an array of cells which contain a wall within a given grid)
    c. entrance (the cell where the path should begin i.e. A1)
-6. User sends a request to ```GET /maze/{mazeId}/solution endpoint``` with steps query parameter which can be either ```min``` or ```max```
+6. User sends a request to ```GET /maze/{mazeId}/solution``` endpoint with steps query parameter which can be either ```min``` or ```max```
 7. The API returns an array of grid cells leading from the entrance of the maze to the exit of the maze with the following rules: 
    a. if ```steps``` parameter is ```min``` the API returns the path from the entrance to the exit with the **least number of steps possible**
    b. if ```steps``` parameter is ```max``` the API returns the path from the entrance to the exit with the **most number of steps possible**
