@@ -1,25 +1,24 @@
 package routes
 
 import (
-	controllers2 "github.com/fitims/exercise/cmd/restapi/controllers"
+	"github.com/fitims/exercise/cmd/restapi/controllers"
 	"github.com/fitims/exercise/cmd/restapi/middleware/authentication"
+	"github.com/fitims/exercise/cmd/restapi/params"
 )
 
 const (
-	MazeId             = ":mazeId"
-	Register           = "/user"
-	Login              = "/login"
-	Maze               = "/maze"
-	Solution           = "/maze/" + MazeId + "/solution"
-	SolutionQueryParam = "steps"
+	Register = "/user"
+	Login    = "/login"
+	Maze     = "/maze"
+	Solution = "/maze/:" + params.MazeId + "/solution"
 )
 
-func SetUserRoutes(grp GroupWrapper, c controllers2.UserController) {
+func SetUserRoutes(grp GroupWrapper, c controllers.UserController) {
 	grp.POST(Register, c.Register)
 	grp.POST(Login, c.Login)
 }
 
-func SetMazeRoutes(grp GroupWrapper, c controllers2.MazeController, a authentication.Authenticator) {
+func SetMazeRoutes(grp GroupWrapper, c controllers.MazeController, a authentication.Authenticator) {
 	grp.POST(Maze, c.CreateMaze, a.AuthenticateUser)
 	grp.GET(Maze, c.GetMazes, a.AuthenticateUser)
 	grp.GET(Solution, c.GetSolution, a.AuthenticateUser)

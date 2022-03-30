@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	controllers2 "github.com/fitims/exercise/cmd/restapi/controllers"
+	"github.com/fitims/exercise/cmd/restapi/controllers"
 	"github.com/fitims/exercise/cmd/restapi/middleware/authentication"
 	"github.com/fitims/exercise/cmd/restapi/routes"
 	"github.com/fitims/exercise/log"
@@ -27,13 +27,13 @@ func main() {
 		return
 	}
 
-	userController := controllers2.NewUserController(repo)
-	mazeController := controllers2.NewMazeController(repo)
+	userController := controllers.NewUserController(repo)
+	mazeController := controllers.NewMazeController(repo)
 	authenticator := authentication.NewUserAuthenticator(repo.GetUserValidator())
 
 	routes.SetUserRoutes(e, userController)
 	routes.SetMazeRoutes(e, mazeController, authenticator)
 
 	log.Infoln("Starting the web service ...")
-	log.Errorln(e.Start(fmt.Sprintf(":%d", 9090)))
+	log.Errorln(e.Start(fmt.Sprintf(":%d", 9990)))
 }

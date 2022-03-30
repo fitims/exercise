@@ -105,7 +105,7 @@ func (c Cell) IsSame(cell Cell) bool {
 
 // String returns a string representation fo the cell
 func (c Cell) String() string {
-	return fmt.Sprintf("%s%d", colNames[c.Col], c.Row)
+	return fmt.Sprintf("%s%d", colNames[c.Col], c.Row+1)
 }
 
 // IndexOf returns the index of the string in the slice of strings.

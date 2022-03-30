@@ -3,9 +3,12 @@ package responses
 import "github.com/fitims/exercise/maze"
 
 type MazeSolutionResponse struct {
-	IsSuccess bool      `json:"is_success"`
-	Message   string    `json:"message"`
-	Solution  maze.Path `json:"solution,omitempty"`
+	IsSuccess bool   `json:"is_success"`
+	Message   string `json:"message"`
+}
+
+type MazeSolutionWithPathResponse struct {
+	Path []string `json:"path"`
 }
 
 func MazeSolutionFailed(msg string) MazeSolutionResponse {
@@ -15,10 +18,8 @@ func MazeSolutionFailed(msg string) MazeSolutionResponse {
 	}
 }
 
-func MazeSolutionSuccessful(p maze.Path) MazeSolutionResponse {
-	return MazeSolutionResponse{
-		IsSuccess: true,
-		Message:   "maze retrieved successfully",
-		Solution:  p,
+func MazeSolutionSuccessful(p maze.Path) MazeSolutionWithPathResponse {
+	return MazeSolutionWithPathResponse{
+		Path: p.ToString(),
 	}
 }
