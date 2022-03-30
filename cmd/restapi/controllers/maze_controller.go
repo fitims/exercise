@@ -93,7 +93,7 @@ func (ctrl defaultMazeController) GetMazes(c echo.Context) error {
 // GetSolution retrieves the solution for the specified maze
 func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
 	steps := c.QueryParam(params.Steps)
-	if len(steps) > 0 && (strings.ToLower(steps) != "min" || strings.ToLower(steps) != "max") {
+	if len(steps) > 0 && (strings.ToLower(steps) != "min" && strings.ToLower(steps) != "max") {
 		return c.JSON(http.StatusBadRequest, responses.MazeSolutionFailed("Invalid request. Steps can be 'min' or 'max"))
 	}
 
@@ -130,7 +130,7 @@ func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
 	// get shortest path
 	path, err := maze.GetShortestPath()
 	ctrl.repository.SaveMaze(authUsr.GetUsername(), maze)
-	
+
 	if err != nil {
 		return c.JSON(http.StatusOK, responses.MazeSolutionFailed(err.Error()))
 	}
