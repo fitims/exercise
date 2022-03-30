@@ -1,0 +1,168 @@
+{
+	"info": {
+		"_postman_id": "6e904021-82c0-4dfc-95fe-3e47267cc136",
+		"name": "maze",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\" : \"test\",\r\n    \"password\" : \"Password!23\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.skenderi.info/user",
+					"protocol": "https",
+					"host": [
+						"api",
+						"skenderi",
+						"info"
+					],
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\" : \"test\",\r\n    \"password\" : \"Password!23\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.skenderi.info/login",
+					"protocol": "https",
+					"host": [
+						"api",
+						"skenderi",
+						"info"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create maze",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDg2NzQ4NTAsImlhdCI6MTY0ODY3NDI1MCwidXNlcm5hbWUiOiJ0ZXN0In0.JFZ7vmHGvJVlDFw6zUn9sWYfmoLpu2tffQNVk2Xbfw0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"entrance\":  \"A1\",\r\n    \"gridSize\": \"8x8\",\r\n    \"walls\" : [\"C1\", \"G1\", \"A2\", \"C2\", \"E2\", \"G2\", \"C3\", \"E3\", \"B4\", \"C4\", \"E4\", \"F4\", \"G4\", \"B5\", \"E5\", \"B6\", \"D6\", \"E6\", \"G6\", \"H6\", \"B7\", \"D7\", \"G7\", \"B8\" ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.skenderi.info/maze",
+					"protocol": "https",
+					"host": [
+						"api",
+						"skenderi",
+						"info"
+					],
+					"path": [
+						"maze"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get mazes for user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDg2NzQ4NTAsImlhdCI6MTY0ODY3NDI1MCwidXNlcm5hbWUiOiJ0ZXN0In0.JFZ7vmHGvJVlDFw6zUn9sWYfmoLpu2tffQNVk2Xbfw0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.skenderi.info/maze",
+					"protocol": "https",
+					"host": [
+						"api",
+						"skenderi",
+						"info"
+					],
+					"path": [
+						"maze"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get maze solution",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NDg2NzQ4NTAsImlhdCI6MTY0ODY3NDI1MCwidXNlcm5hbWUiOiJ0ZXN0In0.JFZ7vmHGvJVlDFw6zUn9sWYfmoLpu2tffQNVk2Xbfw0",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.skenderi.info/maze/1/solution",
+					"protocol": "https",
+					"host": [
+						"api",
+						"skenderi",
+						"info"
+					],
+					"path": [
+						"maze",
+						"1",
+						"solution"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

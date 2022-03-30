@@ -10,4 +10,4 @@ live: clean
 	GOOS=linux go build -o output/maze_api ./main.go
 
 deploy: live
-	scp output/maze_api nzxApi:/go-web/maze_api
+	scp output/maze_api skenderi:/lib/maze/maze_api
