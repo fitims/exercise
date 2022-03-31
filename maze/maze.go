@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/fitims/exercise/log"
+	"sync"
 )
 
 type MazeState int
@@ -118,8 +119,13 @@ func (m *Maze) Solve() error {
 		path := make(Path, 0)
 		path = append(path, m.Entrance)
 
-		// walk through the maze and find all the possible solutions
-		m.walkTheMaze(m.Entrance, path)
+		// walk through the maze and find all the possible solutions in concurrent fashion
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go m.walkTheMaze(m.Entrance, path, &wg)
+
+		// wait until all the maze is walked
+		wg.Wait()
 	}
 
 	if len(m.Solutions) == 0 {
@@ -188,7 +194,8 @@ func (m *Maze) GetPath(predicate PathPredicate) (Path, error) {
 // walkTheMaze is a recursive functions that walks through the maze finding all the possible solutions.
 // For each possible cell movement (Up, Down, Left, Right) it calls itself passing the adjacent cell and
 // the path travelled so far
-func (m *Maze) walkTheMaze(currentCell Cell, currentPath Path) {
+func (m *Maze) walkTheMaze(currentCell Cell, currentPath Path, wg *sync.WaitGroup) {
+	defer wg.Done()
 	m.Matrix.Visit(currentCell)
 
 	if m.Matrix.IsSolution(currentCell) {
@@ -199,25 +206,29 @@ func (m *Maze) walkTheMaze(currentCell Cell, currentPath Path) {
 	// move up
 	if c, ok := currentCell.Up(m.Matrix); ok {
 		p := append(currentPath, c)
-		m.walkTheMaze(c, p)
+		wg.Add(1)
+		go m.walkTheMaze(c, p, wg)
 	}
 
 	// move down
 	if c, ok := currentCell.Down(m.Matrix); ok {
 		p := append(currentPath, c)
-		m.walkTheMaze(c, p)
+		wg.Add(1)
+		go m.walkTheMaze(c, p, wg)
 	}
 
 	// move left
 	if c, ok := currentCell.Left(m.Matrix); ok {
 		p := append(currentPath, c)
-		m.walkTheMaze(c, p)
+		wg.Add(1)
+		go m.walkTheMaze(c, p, wg)
 	}
 
 	// move right
 	if c, ok := currentCell.Right(m.Matrix); ok {
 		p := append(currentPath, c)
-		m.walkTheMaze(c, p)
+		wg.Add(1)
+		go m.walkTheMaze(c, p, wg)
 	}
 }
 
