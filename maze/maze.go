@@ -116,16 +116,16 @@ func NewMaze(id uint64, entrance, gridSize string, wall []string) (*Maze, error)
 func (m *Maze) Solve() error {
 
 	if m.State == NotSolved {
+		wg := sync.WaitGroup{}
 		path := make(Path, 0)
 		path = append(path, m.Entrance)
 
 		// walk through the maze and find all the possible solutions in concurrent fashion
-		wg := sync.WaitGroup{}
 		wg.Add(1)
-		go m.walkTheMaze(m.Entrance, path, &wg)
+		go m.walkTheMaze(m.Matrix, m.Entrance, path, &wg)
 
-		// wait until all the maze is walked
 		wg.Wait()
+		// wait until all the maze is walked
 	}
 
 	if len(m.Solutions) == 0 {
@@ -194,41 +194,42 @@ func (m *Maze) GetPath(predicate PathPredicate) (Path, error) {
 // walkTheMaze is a recursive functions that walks through the maze finding all the possible solutions.
 // For each possible cell movement (Up, Down, Left, Right) it calls itself passing the adjacent cell and
 // the path travelled so far
-func (m *Maze) walkTheMaze(currentCell Cell, currentPath Path, wg *sync.WaitGroup) {
+func (m *Maze) walkTheMaze(matrix Matrix, currentCell Cell, currentPath Path, wg *sync.WaitGroup) {
 	defer wg.Done()
-	m.Matrix.Visit(currentCell)
+	matrix.Visit(currentCell)
+	// fmt.Println(matrix.String())
 
-	if m.Matrix.IsSolution(currentCell) {
+	if matrix.IsSolution(currentCell) {
 		m.Solutions = append(m.Solutions, currentPath)
 		return
 	}
 
 	// move up
-	if c, ok := currentCell.Up(m.Matrix); ok {
+	if c, ok := currentCell.Up(matrix); ok {
 		p := append(currentPath, c)
 		wg.Add(1)
-		go m.walkTheMaze(c, p, wg)
+		go m.walkTheMaze(matrix.Clone(), c, p, wg)
 	}
 
 	// move down
-	if c, ok := currentCell.Down(m.Matrix); ok {
+	if c, ok := currentCell.Down(matrix); ok {
 		p := append(currentPath, c)
 		wg.Add(1)
-		go m.walkTheMaze(c, p, wg)
+		go m.walkTheMaze(matrix.Clone(), c, p, wg)
 	}
 
 	// move left
-	if c, ok := currentCell.Left(m.Matrix); ok {
+	if c, ok := currentCell.Left(matrix); ok {
 		p := append(currentPath, c)
 		wg.Add(1)
-		go m.walkTheMaze(c, p, wg)
+		go m.walkTheMaze(matrix.Clone(), c, p, wg)
 	}
 
 	// move right
-	if c, ok := currentCell.Right(m.Matrix); ok {
+	if c, ok := currentCell.Right(matrix); ok {
 		p := append(currentPath, c)
 		wg.Add(1)
-		go m.walkTheMaze(c, p, wg)
+		go m.walkTheMaze(matrix.Clone(), c, p, wg)
 	}
 }
 

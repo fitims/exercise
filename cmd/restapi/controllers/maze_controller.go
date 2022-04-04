@@ -116,7 +116,7 @@ func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, responses.MazeSolutionFailed("Could not get maze details. please try later on."))
 	}
 
-	// get longest path
+	// get the longest path
 	if strings.ToLower(steps) == "max" {
 		path, err := maze.GetLongestPath()
 		ctrl.repository.SaveMaze(authUsr.GetUsername(), maze)
@@ -127,7 +127,7 @@ func (ctrl defaultMazeController) GetSolution(c echo.Context) error {
 		return c.JSON(http.StatusOK, responses.MazeSolutionSuccessful(path))
 	}
 
-	// get shortest path
+	// get the shortest path
 	path, err := maze.GetShortestPath()
 	ctrl.repository.SaveMaze(authUsr.GetUsername(), maze)
 

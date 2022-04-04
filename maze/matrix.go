@@ -64,3 +64,42 @@ func (m Matrix) Visit(c Cell) {
 func (m Matrix) IsSolution(c Cell) bool {
 	return m[c.Row][c.Col] == Exit
 }
+
+// Clone returns a deep clone of the matrix
+func (m Matrix) Clone() Matrix {
+	clone := make(Matrix, len(m))
+
+	// set the rest of the matrix
+	for r := 0; r < len(m); r++ {
+		cols := make([]CellType, len(m[0]))
+		// set the rest of the columns to free
+		for c := 0; c < len(m[0]); c++ {
+			cols[c] = m[r][c]
+		}
+		clone[r] = cols
+	}
+	return clone
+}
+
+func (m Matrix) String() string {
+	result := ""
+	for r := 0; r < len(m); r++ {
+		row := "|"
+		for c := 0; c < len(m[0]); c++ {
+			switch m[r][c] {
+			case Free:
+				row += " |"
+			case Wall:
+				row += "█|"
+			case Visited:
+				row += "░|"
+			case Exit:
+				row += "x|"
+			}
+		}
+		row += "\n"
+		result += row
+	}
+
+	return result
+}

@@ -121,19 +121,8 @@ func TestMaze_Solve_DifferentSolutions(t *testing.T) {
 	}
 }
 
-func TestMaze_Solve_ManySolutions(t *testing.T) {
-	m := Maze{
-		Id:       0,
-		Entrance: Cell{0, 0},
-		Matrix: Matrix{
-			{Free, Wall, Wall, Free},
-			{Free, Free, Free, Free},
-			{Free, Wall, Wall, Wall},
-			{Free, Free, Free, Free},
-			{Exit, Wall, Wall, Wall},
-		},
-		State: NotSolved,
-	}
+func TestMaze_Solve_ValidSolution(t *testing.T) {
+	m, _ := NewMaze(1, "A1", "8x8", []string{"C1", "G1", "A2", "C2", "E2", "G2", "C3", "E3", "B4", "C4", "E4", "F4", "G4", "B5", "E5", "B6", "D6", "E6", "G6", "H6", "B7", "D7", "G7", "B8"})
 
 	err := m.Solve()
 	if err != nil {
@@ -141,7 +130,20 @@ func TestMaze_Solve_ManySolutions(t *testing.T) {
 	}
 
 	if m.State != Solved {
-		t.Error(fmt.Sprintf("Expected: Solved (3), Got: %d", m.State))
+		t.Error(fmt.Sprintf("Expected: Solved (1), Got: %d", m.State))
+	}
+}
+
+func TestMaze_Solve_ManySolutions(t *testing.T) {
+	m, _ := NewMaze(1, "A1", "8x8", []string{"C1", "G1", "A2", "C2", "E2", "G2", "E3", "B4", "C4", "E4", "F4", "G4", "B5", "E5", "B6", "D6", "E6", "G6", "H6", "B7", "D7", "G7", "B8", "D8", "F8", "G8"})
+
+	err := m.Solve()
+	if err != ManySolutionsErr {
+		t.Error(fmt.Sprintf("Expected: ManySolutionsErr, Got: %v", err))
+	}
+
+	if m.State != TooManySolutions {
+		t.Error(fmt.Sprintf("Expected: TooManySolutions (2), Got: %d", m.State))
 	}
 }
 

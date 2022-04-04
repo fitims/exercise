@@ -97,6 +97,26 @@ func (c Cell) Right(maze Matrix) (Cell, bool) {
 	return Cell{}, false
 }
 
+func (c Cell) CanMove(maze Matrix) bool {
+	if _, ok := c.Down(maze); ok {
+		return true
+	}
+
+	if _, ok := c.Up(maze); ok {
+		return true
+	}
+
+	if _, ok := c.Left(maze); ok {
+		return true
+	}
+
+	if _, ok := c.Right(maze); ok {
+		return true
+	}
+
+	return false
+}
+
 // IsSame compares the cell with the provided one. If the Row and Col are the same
 // then the cells are the same
 func (c Cell) IsSame(cell Cell) bool {
